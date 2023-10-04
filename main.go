@@ -19,6 +19,11 @@ func sniView(w http.ResponseWriter, r *http.Request) {
 }
 
 func sniCreate(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write([]byte("Method not Allowed"))
+		return
+	}
 	w.Write([]byte("sni create"))
 }
 
