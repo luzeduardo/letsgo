@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
@@ -17,7 +19,13 @@ func home(w http.ResponseWriter, r *http.Request) {
 func sniView(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "public, max-age=31536000")
 	w.Header()["Date"] = nil
-	w.Write([]byte("Sni show"))
+
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
+		return
+	}
+	fmt.Fprintf(w, "Display item with ID %d", id)
 }
 
 func sniCreate(w http.ResponseWriter, r *http.Request) {
