@@ -15,6 +15,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 }
 
 func sniView(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "public, max-age=31536000")
 	w.Write([]byte("Sni show"))
 }
 
