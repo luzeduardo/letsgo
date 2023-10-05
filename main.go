@@ -24,7 +24,8 @@ func sniCreate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	w.Write([]byte("sni create"))
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(`{"name":"JOhn Doe"`))
 }
 
 func main() {
