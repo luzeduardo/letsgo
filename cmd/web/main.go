@@ -33,21 +33,12 @@ func main() {
 		infoLog:  infoLog,
 	}
 
-	mux := http.NewServeMux()
-
-	fileServer := http.FileServer(http.Dir(cfg.staticDir))
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
-
-	mux.HandleFunc("/", app.home)
-	mux.HandleFunc("/sni/view", app.sniView)
-	mux.HandleFunc("/sni/create", app.sniCreate)
-
 	infoLog.Printf("Starting server on %s", cfg.addr)
 	// by default http server logs error to stdout
 	srv := &http.Server{
 		Addr:     cfg.addr,
 		ErrorLog: errorLog,
-		Handler:  mux,
+		Handler:  app.routes(cfg),
 	}
 	err := srv.ListenAndServe()
 	errorLog.Fatal(err)
