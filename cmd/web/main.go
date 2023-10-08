@@ -18,7 +18,9 @@ func main() {
 	flag.StringVar(&cfg.staticDir, "static-dir", "./ui/static", "Path to static assets")
 	flag.Parse()
 
+	//log.New(destination, prefix, additional info)
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime)
 
 	mux := http.NewServeMux()
 
@@ -28,7 +30,8 @@ func main() {
 	mux.HandleFunc("/", home)
 	mux.HandleFunc("/sni/view", sniView)
 	mux.HandleFunc("/sni/create", sniCreate)
+
 	infoLog.Printf("Starting server on %s", cfg.addr)
 	err := http.ListenAndServe(cfg.addr, mux)
-	log.Fatal(err)
+	errorLog.Fatal(err)
 }
