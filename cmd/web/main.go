@@ -8,8 +8,14 @@ import (
 )
 
 type config struct {
-	addr string
+	addr      string
 	staticDir string
+}
+
+// holds the app-wide dependencies for the application
+type application struct {
+	errorLog *log.Logger
+	infoLog  *log.Logger
 }
 
 func main() {
@@ -22,21 +28,26 @@ func main() {
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime|log.Llongfile)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Llongfile)
 
+	app := &application{
+		errorLog: errorLog,
+		infoLog:  infoLog,
+	}
+
 	mux := http.NewServeMux()
 
 	fileServer := http.FileServer(http.Dir(cfg.staticDir))
 	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
 
-	mux.HandleFunc("/", home)
-	mux.HandleFunc("/sni/view", sniView)
-	mux.HandleFunc("/sni/create", sniCreate)
+	mux.HandleFunc("/", app.home)
+	mux.HandleFunc("/sni/view", app.sniView)
+	mux.HandleFunc("/sni/create", app.sniCreate)
 
 	infoLog.Printf("Starting server on %s", cfg.addr)
 	// by default http server logs error to stdout
 	srv := &http.Server{
-		Addr: cfg.addr,
+		Addr:     cfg.addr,
 		ErrorLog: errorLog,
-		Handler: mux,
+		Handler:  mux,
 	}
 	err := srv.ListenAndServe()
 	errorLog.Fatal(err)
