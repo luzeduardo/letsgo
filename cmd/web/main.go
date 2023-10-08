@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
 )
 
 type config struct {
@@ -17,6 +18,8 @@ func main() {
 	flag.StringVar(&cfg.staticDir, "static-dir", "./ui/static", "Path to static assets")
 	flag.Parse()
 
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+
 	mux := http.NewServeMux()
 
 	fileServer := http.FileServer(http.Dir(cfg.staticDir))
@@ -25,7 +28,7 @@ func main() {
 	mux.HandleFunc("/", home)
 	mux.HandleFunc("/sni/view", sniView)
 	mux.HandleFunc("/sni/create", sniCreate)
-	log.Printf("Starting server on %s", cfg.addr)
+	infoLog.Printf("Starting server on %s", cfg.addr)
 	err := http.ListenAndServe(cfg.addr, mux)
 	log.Fatal(err)
 }
