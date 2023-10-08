@@ -32,6 +32,12 @@ func main() {
 	mux.HandleFunc("/sni/create", sniCreate)
 
 	infoLog.Printf("Starting server on %s", cfg.addr)
-	err := http.ListenAndServe(cfg.addr, mux)
+	// by default http server logs error to stdout
+	srv := &http.Server{
+		Addr: cfg.addr,
+		ErrorLog: errorLog,
+		Handler: mux,
+	}
+	err := srv.ListenAndServe()
 	errorLog.Fatal(err)
 }
