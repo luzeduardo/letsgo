@@ -8,6 +8,7 @@ import (
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+	"poc.eduardo-luz.eu/internal/models"
 )
 
 type config struct {
@@ -19,6 +20,8 @@ type config struct {
 type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
+	//making the models available to the handlers
+	snippets *models.SnippetModel
 }
 
 func openDB(dsn string) (*sql.DB, error) {
@@ -53,6 +56,7 @@ func main() {
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
+		snippets: &models.SnippetModel{DB: db},
 	}
 
 	infoLog.Printf("Starting server on %s", cfg.addr)
