@@ -50,6 +50,16 @@ func (app *application) sniCreate(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"name":"JOhn Doe"`))
+
+	title := "To dos"
+	content := "Go for devs\nDDD\nGo for dummies"
+	expires := 10
+
+	id, err := app.snippets.Insert(title, content, expires)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	http.Redirect(w, r, fmt.Sprintf("/snippet/view?id=%d", id), http.StatusSeeOther)
+
 }
