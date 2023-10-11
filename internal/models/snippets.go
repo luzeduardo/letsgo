@@ -99,7 +99,3 @@ func (m *SnippetModel) Get(id int) (*Snippet, error) {
 	//return the Snippet struct
 	return s, nil
 }
-
-func (m *SnippetModel) Latest() ([]*Snippet, error) {
-	return nil, nil
-}
