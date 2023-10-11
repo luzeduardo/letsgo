@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 )
 
@@ -37,7 +38,30 @@ func (m *SnippetModel) Insert(title string, content string, expires int) (int, e
 }
 
 func (m *SnippetModel) Get(id int) (*Snippet, error) {
-	return nil, nil
+	stmt := `SELECT id, title, content, created, expires 
+	FROM
+	 snippets WHERE expires > UTC_TIMESTAMP() AND id = ?`
+	row := m.DB.QueryRow(stmt, id)
+	// Initialize a pointer to the new struct
+	s := &Snippet{}
+
+	// copy values from each field in sql.Row to the corresponding field in the Snippet struct
+	// the args are *pointers* to the place I want to copy the data into
+	// the number of args must be exactly the same as the number of columns returned by the statement
+	// convert the raw output of the SQL to the native Go types
+	err := row.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
+	if err != nil {
+		// if the query return no rows, the row.Scan() will return a sql.ErrNoROws error.
+		// use the errors.Is to check for a specifically error and return own ErrNoRecord error
+		// instead
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNoRecord
+		} else {
+			return nil, err
+		}
+	}
+	//return the Snippet struct
+	return s, nil
 }
 
 func (m *SnippetModel) Latest() ([]*Snippet, error) {
