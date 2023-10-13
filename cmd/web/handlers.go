@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"html/template"
 	"net/http"
 	"strconv"
 
@@ -63,8 +64,24 @@ func (app *application) sniView(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	//write data as plain text HTTP response body
-	fmt.Fprintf(w, "%+v", snippet)
+
+	//initialize s alice with paths plus base layout and partial
+	files := []string{
+		"./ui/html/base.tmpl",
+		"./ui/html/partials/nav.tmpl",
+		"./ui/html/pages/view.tmpl",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	err = ts.ExecuteTemplate(w, "base", snippet)
+	if err != nil {
+		app.serverError(w, err)
+	}
 }
 
 func (app *application) sniCreate(w http.ResponseWriter, r *http.Request) {
