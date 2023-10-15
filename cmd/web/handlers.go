@@ -26,17 +26,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		Snippets: snippets,
 	}
 
-	files := []string{
-		"./ui/html/base.tmpl",
-		"./ui/html/partials/nav.tmpl",
-		"./ui/html/pages/home.tmpl",
-	}
-	ts, err := template.ParseFiles(files...)
-	err = ts.ExecuteTemplate(w, "base", data)
-	err = ts.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		app.serverError(w, err) //serverError helper
-	}
+	app.render(w, http.StatusOK, "home.tmpl", data)
 }
 
 func (app *application) sniView(w http.ResponseWriter, r *http.Request) {
