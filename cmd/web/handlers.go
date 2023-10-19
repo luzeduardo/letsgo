@@ -22,9 +22,9 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &templateData{
-		Snippets: snippets,
-	}
+	//Call newTemplateData with the default data and then append the snippets slice to it
+	data := app.newTemplateData(r)
+	data.Snippets = snippets
 
 	app.render(w, http.StatusOK, "home.tmpl", data)
 }
@@ -62,9 +62,8 @@ func (app *application) sniView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &templateData{
-		Snippet: snippet,
-	}
+	data := app.newTemplateData(r)
+	data.Snippet = snippet
 
 	err = ts.ExecuteTemplate(w, "base", data)
 	if err != nil {

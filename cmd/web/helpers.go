@@ -5,7 +5,15 @@ import (
 	"fmt"
 	"net/http"
 	"runtime/debug"
+	"time"
 )
+
+// returns a pointer to a templateData struct initialized with the current year
+func (app *application) newTemplateData(r *http.Request) *templateData {
+	return &templateData{
+		CurrentYear: time.Now().Year(),
+	}
+}
 
 func (app *application) render(w http.ResponseWriter, status int, page string, data *templateData) {
 	//retrieve the template set from the cache
