@@ -13,5 +13,5 @@ func (app *application) routes(cfg config) http.Handler {
 	mux.HandleFunc("/sni/view", app.sniView)
 	mux.HandleFunc("/sni/create", app.sniCreate)
 	// pass servemux as the next http.Handler to be executed
-	return app.logRequest(secureHeaders(mux))
+	return app.recoverPanic(app.logRequest(secureHeaders(mux)))
 }

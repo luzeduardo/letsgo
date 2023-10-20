@@ -1,6 +1,22 @@
 package main
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
+
+func (app *application) recoverPanic(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//create a defer func that will always run on a panic happens at the stack
+		defer func() {
+			if err := recover(); err != nil {
+				w.Header().Set("Connection", "close")
+				app.serverError(w, fmt.Errorf("%s", err))
+			}
+		}()
+		next.ServeHTTP(w, r)
+	})
+}
 
 func secureHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
