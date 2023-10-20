@@ -3,6 +3,7 @@ package main
 import (
 	"html/template"
 	"path/filepath"
+	"time"
 
 	"poc.eduardo-luz.eu/internal/models"
 )
@@ -12,6 +13,16 @@ type templateData struct {
 	CurrentYear int
 	Snippet     *models.Snippet
 	Snippets    []*models.Snippet
+}
+
+func humanDate(t time.Time) string {
+	return t.Format("02 Jan 2006 at 15:04")
+}
+
+// map of functions that we want to make available to all our templates
+// template functions can return only 1 value
+var functions = template.FuncMap{
+	"humanDate": humanDate,
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {
@@ -27,8 +38,9 @@ func newTemplateCache() (map[string]*template.Template, error) {
 		//extract the filename from the fullpath
 		name := filepath.Base(page)
 
-		//parse the base template into a template set
-		ts, err := template.ParseFiles("./ui/html/base.tmpl")
+		// FuncMap must be registered before calling ParseFiles
+		// create a new template set, add the template functions and then parse files
+		ts, err := template.New(name).Funcs(functions).ParseFiles("./ui/html/base.tmpl")
 		if err != nil {
 			return nil, err
 		}
