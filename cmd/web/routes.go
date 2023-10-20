@@ -2,7 +2,8 @@ package main
 
 import "net/http"
 
-func (app *application) routes(cfg config) *http.ServeMux {
+// now returns a handler instead of servemux
+func (app *application) routes(cfg config) http.Handler {
 	mux := http.NewServeMux()
 
 	fileServer := http.FileServer(http.Dir(cfg.staticDir))
@@ -11,6 +12,6 @@ func (app *application) routes(cfg config) *http.ServeMux {
 	mux.HandleFunc("/", app.home)
 	mux.HandleFunc("/sni/view", app.sniView)
 	mux.HandleFunc("/sni/create", app.sniCreate)
-
-	return mux
+	// pass servemux as the next http.Handler to be executed
+	return secureHeaders(mux)
 }
