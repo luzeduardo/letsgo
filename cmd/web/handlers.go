@@ -73,7 +73,8 @@ func (app *application) sniView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) sniCreate(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Form"))
+	data := app.newTemplateData(r)
+	app.render(w, http.StatusOK, "create.go.tmpl", data)
 }
 
 func (app *application) sniCreatePost(w http.ResponseWriter, r *http.Request) {
