@@ -29,7 +29,7 @@ func newTemplateCache() (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
 
 	// gives a slice of all the filepaths for our application 'page' templates
-	pages, err := filepath.Glob("./ui/html/pages/*.tmpl")
+	pages, err := filepath.Glob("./ui/html/pages/*.go.tmpl")
 	if err != nil {
 		return nil, err
 	}
@@ -40,13 +40,13 @@ func newTemplateCache() (map[string]*template.Template, error) {
 
 		// FuncMap must be registered before calling ParseFiles
 		// create a new template set, add the template functions and then parse files
-		ts, err := template.New(name).Funcs(functions).ParseFiles("./ui/html/base.tmpl")
+		ts, err := template.New(name).Funcs(functions).ParseFiles("./ui/html/base.go.tmpl")
 		if err != nil {
 			return nil, err
 		}
 
 		//ParseGlob to add any partials
-		ts, err = ts.ParseGlob("./ui/html/partials/*.tmpl")
+		ts, err = ts.ParseGlob("./ui/html/partials/*.go.tmpl")
 		if err != nil {
 			return nil, err
 		}

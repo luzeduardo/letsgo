@@ -23,7 +23,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Snippets = snippets
 
-	app.render(w, http.StatusOK, "home.tmpl", data)
+	app.render(w, http.StatusOK, "home.go.tmpl", data)
 }
 
 func (app *application) sniView(w http.ResponseWriter, r *http.Request) {
@@ -52,9 +52,9 @@ func (app *application) sniView(w http.ResponseWriter, r *http.Request) {
 
 	//initialize s alice with paths plus base layout and partial
 	files := []string{
-		"./ui/html/base.tmpl",
-		"./ui/html/partials/nav.tmpl",
-		"./ui/html/pages/view.tmpl",
+		"./ui/html/base.go.tmpl",
+		"./ui/html/partials/nav.go.tmpl",
+		"./ui/html/pages/view.go.tmpl",
 	}
 
 	ts, err := template.ParseFiles(files...)
