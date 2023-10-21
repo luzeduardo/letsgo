@@ -1,1 +1,4 @@
 .idea
+.vscode
+cmd/web/__debug_*
+
