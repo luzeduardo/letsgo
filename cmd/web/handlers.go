@@ -7,14 +7,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/julienschmidt/httprouter"
 	"poc.eduardo-luz.eu/internal/models"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		app.notFound(w)
-		return
-	}
 
 	snippets, err := app.snippets.Latest()
 	if err != nil {
@@ -33,7 +30,11 @@ func (app *application) sniView(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "public, max-age=31536000")
 	w.Header()["Date"] = nil
 
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	// values of any named parameters will be stored in the request context
+	// returns a slice containing names and values params
+	params := httprouter.ParamsFromContext(r.Context())
+
+	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil || id < 1 {
 		app.notFound(w)
 		return
@@ -72,6 +73,10 @@ func (app *application) sniView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) sniCreate(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Form"))
+}
+
+func (app *application) sniCreatePost(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", "POST")
 		app.clientError(w, http.StatusMethodNotAllowed)
@@ -87,6 +92,6 @@ func (app *application) sniCreate(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	http.Redirect(w, r, fmt.Sprintf("/snippet/view?id=%d", id), http.StatusSeeOther)
-
+	//changes to format handled by httprouter
+	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
 }
