@@ -78,15 +78,19 @@ func (app *application) sniCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) sniCreatePost(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.Header().Set("Allow", "POST")
-		app.clientError(w, http.StatusMethodNotAllowed)
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
-	title := "To dos"
-	content := "Go for devs\nDDD\nGo for dummies"
-	expires := 10
+	title := r.PostForm.Get("title")
+	content := r.PostForm.Get("content")
+	expires, err := strconv.Atoi(r.PostForm.Get("expires"))
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
 
 	id, err := app.snippets.Insert(title, content, expires)
 	if err != nil {
@@ -94,5 +98,5 @@ func (app *application) sniCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//changes to format handled by httprouter
-	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/sni/view/%d", id), http.StatusSeeOther)
 }
