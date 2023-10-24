@@ -83,6 +83,10 @@ func (app *application) sniView(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) sniCreate(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
+
+	data.Form = snippetCreateForm{
+		Expires: 365,
+	}
 	app.render(w, http.StatusOK, "create.go.tmpl", data)
 }
 
