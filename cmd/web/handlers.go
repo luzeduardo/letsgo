@@ -78,6 +78,8 @@ func (app *application) sniCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) sniCreatePost(w http.ResponseWriter, r *http.Request) {
+	r.Body = http.MaxBytesReader(w, r.Body, 4096) //limits request body to 4kb
+
 	err := r.ParseForm()
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
