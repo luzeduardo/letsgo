@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
 	"poc.eduardo-luz.eu/internal/models"
 )
@@ -24,6 +25,7 @@ type application struct {
 	//making the models available to the handlers
 	snippets      *models.SnippetModel
 	templateCache map[string]*template.Template
+	formDecoder   *form.Decoder //holds a pointer to the form.Decoder instance
 }
 
 func openDB(dsn string) (*sql.DB, error) {
@@ -61,11 +63,14 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	formDecoder := *form.NewDecoder()
+
 	app := &application{
 		errorLog:      errorLog,
 		infoLog:       infoLog,
 		snippets:      &models.SnippetModel{DB: db},
 		templateCache: templateCache, //adds to app deps
+		formDecoder:   &formDecoder,
 	}
 
 	infoLog.Printf("Starting server on %s", cfg.addr)

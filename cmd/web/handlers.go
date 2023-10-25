@@ -13,10 +13,10 @@ import (
 )
 
 type snippetCreateForm struct {
-	Title   string
-	Content string
-	Expires int
-	validator.Validator
+	Title               string     `form:"title"` //tells the decoder to store the value from the input title in the title field
+	Content             string     `form:"content"`
+	Expires             int        `form:"expires"`
+	validator.Validator `form:"-"` //tells the decode to ignore a field during the decoding
 }
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -98,16 +98,12 @@ func (app *application) sniCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	expires, err := strconv.Atoi(r.PostForm.Get("expires"))
+	var form snippetCreateForm
+	// fills with values the struct with the request and the pointer to the struct. instead of initializing
+	// and fulfill the struct manually
+	err = app.decodePostForm(r, &form) // requires a non-nil pointer or returns a form.InvalidDecoderError
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	form := snippetCreateForm{
-		Title:   r.PostForm.Get("title"),
-		Content: r.PostForm.Get("content"),
-		Expires: expires,
 	}
 
 	form.CheckField(validator.NotBlank(form.Title), "title", "This field is required")
@@ -123,7 +119,7 @@ func (app *application) sniCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := app.snippets.Insert(form.Title, form.Content, expires)
+	id, err := app.snippets.Insert(form.Title, form.Content, form.Expires)
 	if err != nil {
 		app.serverError(w, err)
 		return

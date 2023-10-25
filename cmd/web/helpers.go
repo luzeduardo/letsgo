@@ -2,11 +2,32 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 	"runtime/debug"
 	"time"
+
+	"github.com/go-playground/form/v4"
 )
+
+func (app *application) decodePostForm(r *http.Request, destination any) error {
+	err := r.ParseForm()
+	if err != nil {
+		return err
+	}
+
+	err = app.formDecoder.Decode(destination, r.PostForm)
+	if err != nil {
+		var invalidDecodeError *form.InvalidDecoderError
+
+		if errors.As(err, &invalidDecodeError) {
+			panic(err)
+		}
+		return err
+	}
+	return nil
+}
 
 // returns a pointer to a templateData struct initialized with the current year
 func (app *application) newTemplateData(r *http.Request) *templateData {
