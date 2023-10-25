@@ -92,23 +92,17 @@ func (app *application) sniCreate(w http.ResponseWriter, r *http.Request) {
 func (app *application) sniCreatePost(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, 4096) //limits request body to 4kb
 
-	err := r.ParseForm()
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
 	var form snippetCreateForm
 	// fills with values the struct with the request and the pointer to the struct. instead of initializing
 	// and fulfill the struct manually
-	err = app.decodePostForm(r, &form) // requires a non-nil pointer or returns a form.InvalidDecoderError
+	err := app.decodePostForm(r, &form) // requires a non-nil pointer or returns a form.InvalidDecoderError
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 	}
 
 	form.CheckField(validator.NotBlank(form.Title), "title", "This field is required")
 	form.CheckField(validator.MaxChars(form.Title, 100), "title", "This fields cannot be more than 100 characters long")
-	form.CheckField(validator.NotBlank(form.Content), "title", "This field is required")
+	form.CheckField(validator.NotBlank(form.Content), "content", "This field is required")
 	form.CheckField(validator.PermittedInt(form.Expires, 1, 7, 365), "expires", "This field must equal 1, 7 or 365")
 
 	// if threre is any error, dump in a plain text HTTP response
