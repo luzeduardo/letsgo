@@ -7,7 +7,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/alexedwards/scs/mysqlstore"
+	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
 	"poc.eduardo-luz.eu/internal/models"
@@ -23,9 +26,10 @@ type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
 	//making the models available to the handlers
-	snippets      *models.SnippetModel
-	templateCache map[string]*template.Template
-	formDecoder   *form.Decoder //holds a pointer to the form.Decoder instance
+	snippets       *models.SnippetModel
+	templateCache  map[string]*template.Template
+	formDecoder    *form.Decoder //holds a pointer to the form.Decoder instance
+	sessionManager *scs.SessionManager
 }
 
 func openDB(dsn string) (*sql.DB, error) {
@@ -65,12 +69,17 @@ func main() {
 
 	formDecoder := *form.NewDecoder()
 
+	sessionManager := scs.New()
+	sessionManager.Store = mysqlstore.New(db)
+	sessionManager.Lifetime = 12 * time.Hour
+
 	app := &application{
-		errorLog:      errorLog,
-		infoLog:       infoLog,
-		snippets:      &models.SnippetModel{DB: db},
-		templateCache: templateCache, //adds to app deps
-		formDecoder:   &formDecoder,
+		errorLog:       errorLog,
+		infoLog:        infoLog,
+		snippets:       &models.SnippetModel{DB: db},
+		templateCache:  templateCache, //adds to app deps
+		formDecoder:    &formDecoder,
+		sessionManager: sessionManager,
 	}
 
 	infoLog.Printf("Starting server on %s", cfg.addr)
