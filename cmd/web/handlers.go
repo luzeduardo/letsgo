@@ -123,3 +123,23 @@ func (app *application) sniCreatePost(w http.ResponseWriter, r *http.Request) {
 	//changes to format handled by httprouter
 	http.Redirect(w, r, fmt.Sprintf("/sni/view/%d", id), http.StatusSeeOther)
 }
+
+func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Signup form")
+}
+
+func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Creates the user")
+}
+
+func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "form for user login")
+}
+
+func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Authenticate and login user")
+}
+
+func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Logout user")
+}

@@ -28,6 +28,12 @@ func (app *application) routes(cfg config) http.Handler {
 	router.Handler(http.MethodGet, "/sni/view/:id", dynamic.ThenFunc(app.sniView))
 	router.Handler(http.MethodGet, "/sni/create", dynamic.ThenFunc(app.sniCreate))
 	router.Handler(http.MethodPost, "/sni/create", dynamic.ThenFunc(app.sniCreatePost))
+	router.Handler(http.MethodGet, "/user/signup", dynamic.ThenFunc(app.userSignup))
+	router.Handler(http.MethodPost, "/user/signup", dynamic.ThenFunc(app.userSignupPost))
+	router.Handler(http.MethodGet, "/user/login", dynamic.ThenFunc(app.userLogin))
+	router.Handler(http.MethodPost, "/user/login", dynamic.ThenFunc(app.userLoginPost))
+	router.Handler(http.MethodPost, "/user/logout", dynamic.ThenFunc(app.userLogoutPost))
+
 	// creates a middleware chain
 	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 	//return the middleware chain
