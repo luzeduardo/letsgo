@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"html/template"
@@ -82,14 +83,20 @@ func main() {
 		sessionManager: sessionManager,
 	}
 
+	//setting a non-default TLS config about elliptic curve preferences
+	tlsConfig := &tls.Config{
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+	}
+
 	infoLog.Printf("Starting server on %s", cfg.addr)
 	// by default http server logs error to stdout
 	srv := &http.Server{
-		Addr:     cfg.addr,
-		ErrorLog: errorLog,
-		Handler:  app.routes(cfg),
+		Addr:      cfg.addr,
+		ErrorLog:  errorLog,
+		Handler:   app.routes(cfg),
+		TLSConfig: tlsConfig,
 	}
 
-	err = srv.ListenAndServe()
+	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	errorLog.Fatal(err)
 }
