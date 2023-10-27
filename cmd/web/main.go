@@ -99,10 +99,14 @@ func main() {
 	infoLog.Printf("Starting server on %s", cfg.addr)
 	// by default http server logs error to stdout
 	srv := &http.Server{
-		Addr:      cfg.addr,
-		ErrorLog:  errorLog,
-		Handler:   app.routes(cfg),
-		TLSConfig: tlsConfig,
+		Addr:           cfg.addr,
+		MaxHeaderBytes: 524288,
+		ErrorLog:       errorLog,
+		Handler:        app.routes(cfg),
+		TLSConfig:      tlsConfig,
+		IdleTimeout:    time.Minute,
+		ReadTimeout:    5 * time.Second,
+		WriteTimeout:   10 * time.Second,
 	}
 
 	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
