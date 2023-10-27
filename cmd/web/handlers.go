@@ -73,8 +73,6 @@ func (app *application) sniView(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
 	data.Snippet = snippet
-	flash := app.sessionManager.PopString(r.Context(), "flash")
-	data.Flash = flash
 
 	err = ts.ExecuteTemplate(w, "base", data)
 	if err != nil {
