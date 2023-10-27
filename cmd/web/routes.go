@@ -18,10 +18,12 @@ func (app *application) routes(cfg config) http.Handler {
 	fileServer := http.FileServer(http.Dir(cfg.staticDir))
 	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
 
-	router.HandlerFunc(http.MethodGet, "/", app.home)
-	router.HandlerFunc(http.MethodGet, "/sni/view/:id", app.sniView)
-	router.HandlerFunc(http.MethodGet, "/sni/create", app.sniCreate)
-	router.HandlerFunc(http.MethodPost, "/sni/create", app.sniCreatePost)
+	dynamic := alice.New(app.sessionManager.LoadAndSave)
+
+	router.Handler(http.MethodGet, "/", dynamic.ThenFunc(app.home))
+	router.Handler(http.MethodGet, "/sni/view/:id", dynamic.ThenFunc(app.sniView))
+	router.Handler(http.MethodGet, "/sni/create", dynamic.ThenFunc(app.sniCreate))
+	router.Handler(http.MethodPost, "/sni/create", dynamic.ThenFunc(app.sniCreatePost))
 	// creates a middleware chain
 	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 	//return the middleware chain
