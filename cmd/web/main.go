@@ -28,6 +28,7 @@ type application struct {
 	infoLog  *log.Logger
 	//making the models available to the handlers
 	snippets       *models.SnippetModel
+	users          *models.UserModel
 	templateCache  map[string]*template.Template
 	formDecoder    *form.Decoder //holds a pointer to the form.Decoder instance
 	sessionManager *scs.SessionManager
@@ -78,6 +79,7 @@ func main() {
 		errorLog:       errorLog,
 		infoLog:        infoLog,
 		snippets:       &models.SnippetModel{DB: db},
+		users:          &models.UserModel{DB: db},
 		templateCache:  templateCache, //adds to app deps
 		formDecoder:    &formDecoder,
 		sessionManager: sessionManager,
