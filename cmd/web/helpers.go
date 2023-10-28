@@ -32,8 +32,9 @@ func (app *application) decodePostForm(r *http.Request, destination any) error {
 // returns a pointer to a templateData struct initialized with the current year
 func (app *application) newTemplateData(r *http.Request) *templateData {
 	return &templateData{
-		CurrentYear: time.Now().Year(),
-		Flash:       app.sessionManager.PopString(r.Context(), "flash"),
+		CurrentYear:     time.Now().Year(),
+		Flash:           app.sessionManager.PopString(r.Context(), "flash"),
+		IsAuthenticated: app.isAuthenticated(r), //adds the auth status to template data
 	}
 }
 
@@ -82,4 +83,8 @@ func (app *application) notFound(w http.ResponseWriter) {
 
 func (app *application) info(w http.ResponseWriter, content string) {
 	app.infoLog.Output(2, content)
+}
+
+func (app *application) isAuthenticated(r *http.Request) bool {
+	return app.sessionManager.Exists(r.Context(), "authenticatedUserID")
 }
