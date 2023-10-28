@@ -12,6 +12,8 @@ import (
 	"poc.eduardo-luz.eu/internal/validator"
 )
 
+const USER_SESSSION_ID = "authenticatedUserID"
+
 type snippetCreateForm struct {
 	Title               string     `form:"title"` //tells the decoder to store the value from the input title in the title field
 	Content             string     `form:"content"`
@@ -230,11 +232,20 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.sessionManager.Put(r.Context(), "authenticatedUserID", id)
+	app.sessionManager.Put(r.Context(), USER_SESSSION_ID, id)
 
 	http.Redirect(w, r, "/sni/create", http.StatusSeeOther)
 }
 
 func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Logout user")
+	err := app.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	app.sessionManager.Remove(r.Context(), USER_SESSSION_ID)
+	app.sessionManager.Put(r.Context(), "flash", "You've beelon logged out!")
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
