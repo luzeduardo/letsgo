@@ -5,6 +5,18 @@ import (
 	"net/http"
 )
 
+func (app *application) requireAuthentication(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !app.isAuthenticated(r) {
+			http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+		}
+		//pages that requires authentication do not store in browser cache
+		w.Header().Add("cache-control", "no-store")
+		//call next handler in the chain
+		next.ServeHTTP(w, r)
+	})
+}
+
 func (app *application) recoverPanic(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		//create a defer func that will always run on a panic happens at the stack
