@@ -23,7 +23,7 @@ func (app *application) routes(cfg config) http.Handler {
 	// then adds the data to the request context, so it can be used in the handlers
 	// also any changes from the handlers are updated in the request context and the middleware updates the DB
 	// Unprotected application routes using the dynamic middleware chain
-	dynamic := alice.New(app.sessionManager.LoadAndSave)
+	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf)
 
 	router.Handler(http.MethodGet, "/", dynamic.ThenFunc(app.home))
 	router.Handler(http.MethodGet, "/user/signup", dynamic.ThenFunc(app.userSignup))

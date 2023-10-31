@@ -2,6 +2,7 @@
 
 {{ define "main"}}
   <form action="/sni/create" method="POST">
+    <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
     <div>
       <label>Title:</label>
       <!-- use with to render the value of .Form.FieldErrors.title -->
