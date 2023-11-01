@@ -5,6 +5,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
+	"poc.eduardo-luz.eu/ui"
 )
 
 // now returns a handler instead of servemux
@@ -15,8 +16,10 @@ func (app *application) routes(cfg config) http.Handler {
 		app.notFound(w)
 	})
 
-	fileServer := http.FileServer(http.Dir(cfg.staticDir))
-	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
+	//take embedded FS and convert it to a http.FS interface
+	fileServer := http.FileServer(http.FS(ui.Files))
+	//now it is not required to strip the /static from the URL of static files because the we can pass the request directly to the file server
+	router.Handler(http.MethodGet, "/static/*filepath", fileServer)
 
 	// checks the incmoning request for a session cookie
 	//if present , reads the session cookie and retrieves the cooresponding session data from the DB
