@@ -2,10 +2,12 @@ package main
 
 import (
 	"html/template"
+	"io/fs"
 	"path/filepath"
 	"time"
 
 	"poc.eduardo-luz.eu/internal/models"
+	"poc.eduardo-luz.eu/ui"
 )
 
 // acts as a holding structure for dynamic data that will be available to the templates
@@ -33,7 +35,7 @@ func newTemplateCache() (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
 
 	// gives a slice of all the filepaths for our application 'page' templates
-	pages, err := filepath.Glob("./ui/html/pages/*.go.tmpl")
+	pages, err := fs.Glob(ui.Files, "html/pages/*.go.tmpl")
 	if err != nil {
 		return nil, err
 	}
@@ -42,20 +44,17 @@ func newTemplateCache() (map[string]*template.Template, error) {
 		//extract the filename from the fullpath
 		name := filepath.Base(page)
 
-		// FuncMap must be registered before calling ParseFiles
+		// (not using File system embedded) FuncMap must be registered before calling ParseFiles
 		// create a new template set, add the template functions and then parse files
-		ts, err := template.New(name).Funcs(functions).ParseFiles("./ui/html/base.go.tmpl")
-		if err != nil {
-			return nil, err
+
+		patterns := []string{
+			"html/base.go.tmpl",
+			"html/partials/*.go.tmpl",
+			page,
 		}
 
-		//ParseGlob to add any partials
-		ts, err = ts.ParseGlob("./ui/html/partials/*.go.tmpl")
-		if err != nil {
-			return nil, err
-		}
-
-		ts, err = ts.ParseFiles(page)
+		// now it parse html directly from the Filesystem instead of the files (using embedded FS)
+		ts, err := template.New(name).Funcs(functions).ParseFS(ui.Files, patterns...)
 		if err != nil {
 			return nil, err
 		}
