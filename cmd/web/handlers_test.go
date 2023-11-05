@@ -3,12 +3,47 @@ package main
 import (
 	"bytes"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"poc.eduardo-luz.eu/internal/assert"
 )
+
+func TestPingE2E(t *testing.T) {
+	//creates an appl struct with some mocks required by logRequest and recoverPanic middlewares
+	app := &application{
+		errorLog: log.New(io.Discard, "", 0),
+		infoLog:  log.New(io.Discard, "", 0),
+	}
+
+	//creates a new test server
+	//to create it is required to pass a http.Handler as parameter. it will be called every time
+	//the server receives a request
+	config := config{}
+	ts := httptest.NewTLSServer(app.routes(config))
+	defer ts.Close()
+
+	//test server client to send requests to the server
+	clientServer := ts.Client()
+	response, err := clientServer.Get(ts.URL + "/ping")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, response.StatusCode, http.StatusOK)
+	defer response.Body.Close()
+
+	body, err := io.ReadAll(response.Body)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	bytes.TrimSpace(body)
+
+	assert.Equal(t, string(body), "OK")
+}
 
 func TestPing(t *testing.T) {
 	rr := httptest.NewRecorder()

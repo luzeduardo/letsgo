@@ -21,6 +21,7 @@ func (app *application) routes(cfg config) http.Handler {
 	//now it is not required to strip the /static from the URL of static files because the we can pass the request directly to the file server
 	router.Handler(http.MethodGet, "/static/*filepath", fileServer)
 
+	router.HandlerFunc(http.MethodGet, "/ping", ping)
 	// checks the incmoning request for a session cookie
 	//if present , reads the session cookie and retrieves the cooresponding session data from the DB
 	// then adds the data to the request context, so it can be used in the handlers
