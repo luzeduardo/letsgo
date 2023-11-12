@@ -11,6 +11,19 @@ import (
 	"poc.eduardo-luz.eu/internal/assert"
 )
 
+func TestPingWithHelpers(t *testing.T) {
+	app := newTestApplication(t)
+
+	config := config{}
+	ts := newTestServer(t, app.routes(config))
+	defer ts.Close()
+
+	code, _, body := ts.get(t, "/ping")
+
+	assert.Equal(t, code, http.StatusOK)
+	assert.Equal(t, body, "OK")
+}
+
 func TestPingE2E(t *testing.T) {
 	//creates an appl struct with some mocks required by logRequest and recoverPanic middlewares
 	app := &application{
