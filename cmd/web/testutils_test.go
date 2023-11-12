@@ -32,6 +32,12 @@ func newTestServer(t *testing.T, h http.Handler) *testServer {
 
 	ts.Client().Jar = jar
 
+	//disable redirect-follow for the test server and client by setting a custom check redirect function
+	ts.Client().CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		//forces the client to immediately return the received response by always returning a ErrUseLastResponse
+		return http.ErrUseLastResponse
+	}
+
 	return &testServer{ts}
 }
 
