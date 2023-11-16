@@ -27,8 +27,9 @@ type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
 	//making the models available to the handlers
-	snippets       *models.SnippetModel
-	users          *models.UserModel
+	//changing type to interfaces so the app struct can handle with the mocked version for the tests and real implementation
+	snippets       models.SnippetModelInterface
+	users          models.UserModelInterface
 	templateCache  map[string]*template.Template
 	formDecoder    *form.Decoder //holds a pointer to the form.Decoder instance
 	sessionManager *scs.SessionManager
