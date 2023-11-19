@@ -24,6 +24,62 @@ func TestPingWithHelpers(t *testing.T) {
 	assert.Equal(t, body, "OK")
 }
 
+func TestSnippetView(t *testing.T) {
+	//creates app struct with the mocked deps
+	app := newTestApplication(t)
+
+	config := config{}
+	//stablish a new test server for running e2e tests
+	ts := newTestServer(t, app.routes(config))
+	defer ts.Close()
+
+	tests := []struct {
+		name     string
+		urlPath  string
+		wantCode int
+		wantBody string
+	}{
+		{
+			name:     "Valid ID",
+			urlPath:  "/sni/view/1",
+			wantCode: http.StatusOK,
+			wantBody: "Content",
+		},
+		{
+			name:     "Invalid ID",
+			urlPath:  "/sni/view/2",
+			wantCode: http.StatusNotFound,
+		},
+		{
+			name:     "Negative ID",
+			urlPath:  "/sni/view/-2",
+			wantCode: http.StatusNotFound,
+		},
+		{
+			name:     "String ID",
+			urlPath:  "/sni/view/a",
+			wantCode: http.StatusNotFound,
+		},
+		{
+			name:     "Empty ID",
+			urlPath:  "/sni/view/",
+			wantCode: http.StatusNotFound,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			code, _, body := ts.get(t, tt.urlPath)
+
+			assert.Equal(t, code, tt.wantCode)
+
+			if tt.wantBody != "" {
+				assert.StringContains(t, body, tt.wantBody)
+			}
+		})
+	}
+}
+
 func TestPingE2E(t *testing.T) {
 	//creates an appl struct with some mocks required by logRequest and recoverPanic middlewares
 	app := &application{

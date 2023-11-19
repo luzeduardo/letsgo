@@ -37,7 +37,7 @@ func (app *application) routes(cfg config) http.Handler {
 
 	protected := dynamic.Append(app.requireAuthentication)
 	// protected authenticated application routes that includes requiredAuthentication middleware
-	router.Handler(http.MethodGet, "/sni/view/:id", protected.ThenFunc(app.sniView))
+	router.Handler(http.MethodGet, "/sni/view/:id", dynamic.ThenFunc(app.sniView))
 	router.Handler(http.MethodPost, "/sni/create", protected.ThenFunc(app.sniCreatePost))
 	router.Handler(http.MethodGet, "/sni/create", protected.ThenFunc(app.sniCreate))
 	router.Handler(http.MethodPost, "/user/logout", protected.ThenFunc(app.userLogoutPost))

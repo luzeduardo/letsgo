@@ -65,7 +65,8 @@ func newTestServer(t *testing.T, h http.Handler) *testServer {
 // implement a get method on the custom testServer.
 // it mkaes a GET request to a given url using the testclient and returns the response status code
 func (ts *testServer) get(t *testing.T, urlPath string) (int, http.Header, string) {
-	rs, err := ts.Client().Get(ts.URL + urlPath)
+	route := ts.URL + urlPath
+	rs, err := ts.Client().Get(route)
 	if err != nil {
 		t.Fatal(err)
 	}
