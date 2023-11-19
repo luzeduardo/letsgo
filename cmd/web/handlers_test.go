@@ -142,3 +142,17 @@ func TestPing(t *testing.T) {
 
 	assert.Equal(t, string(body), "OK")
 }
+
+func TestUserSignup(t *testing.T) {
+	config := config{}
+	// test application with mocked deps
+	app := newTestApplication(t)
+	ts := newTestServer(t, app.routes(config))
+	defer ts.Close()
+
+	_, _, body := ts.get(t, "/user/signup")
+	csrfToken := extractCSRFToken(t, body)
+
+	t.Logf("CSRF token is: %q", csrfToken)
+
+}
